@@ -19,3 +19,48 @@ TEST(circle_map, constructor)
 	ASSERT_EQ(cm.size(), 0);
 	ASSERT_TRUE(cm.empty());
 }
+
+TEST(circle_map, contains)
+{
+	circle_map<key, value> cm(2);
+	cm.push_back("a", 1);
+	cm.push_back("b", 2);
+	cm.push_back("c", 3);
+	ASSERT_TRUE(cm.contains("c"));
+}
+
+TEST(circle_map, contains_reverse_find)
+{
+	circle_map<key, value> cm(2);
+	cm.push_back("a", 1);
+	cm.push_back("b", 2);
+	cm.push_back("c", 3);
+	ASSERT_TRUE(cm.contains("c", true));
+}
+
+TEST(circle_map, push_back_normal)
+{
+	circle_map<key, value> cm(2);
+	cm.push_back("a", 1);
+	ASSERT_TRUE(!cm.empty());
+}
+
+TEST(circle_map, push_back_duplicate)
+{
+	circle_map<key, value> cm(2);
+	cm.push_back("a", 1);
+	cm.push_back("a", 2);
+	auto item = cm.get_and_pop_front();
+	ASSERT_EQ(item.second, 2);
+}
+
+TEST(circle_map, pop_front_normal)
+{
+	circle_map<key, value> cm(2);
+	cm.push_back("a", 1);
+	cm.push_back("2", 2);
+	auto item = cm.get_and_pop_front();
+	ASSERT_EQ(item.first, "a");
+	ASSERT_EQ(item.second, 1);
+	ASSERT_EQ(1, cm.size());
+}
