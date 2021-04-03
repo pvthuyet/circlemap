@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 
 TEST(circle_map, constructor)
 {
-	circle_map<key, value> cm(2);
+	circle_map<key, value> cm(2); 
 	ASSERT_EQ(cm.capacity(), 2);
 	ASSERT_EQ(cm.size(), 0);
 	ASSERT_TRUE(cm.empty());
