@@ -38,6 +38,24 @@ TEST(circle_map, contains_reverse_find)
 	ASSERT_TRUE(cm.contains("c", true));
 }
 
+TEST(circle_map, erase_empty_map)
+{
+	circle_map<key, value> cm(2);
+	auto it = cm.erase("c");
+	ASSERT_TRUE(!it.m_it);
+}
+
+TEST(circle_map, erase)
+{
+	circle_map<key, value> cm(2);
+	cm.push_back("a", 1);
+	cm.push_back("b", 2);
+	cm.push_back("c", 3);
+	cm.erase("c");
+	ASSERT_FALSE(cm.contains("c"));
+	ASSERT_EQ(cm.size(), 1);
+}
+
 TEST(circle_map, push_back_normal)
 {
 	circle_map<key, value> cm(2);
@@ -51,7 +69,7 @@ TEST(circle_map, push_back_duplicate)
 	cm.push_back("a", 1);
 	cm.push_back("a", 2);
 	auto item = cm.get_and_pop_front();
-	ASSERT_EQ(item.second, 2);
+	ASSERT_EQ(item->second, 2);
 }
 
 TEST(circle_map, pop_front_normal)
@@ -60,7 +78,14 @@ TEST(circle_map, pop_front_normal)
 	cm.push_back("a", 1);
 	cm.push_back("2", 2);
 	auto item = cm.get_and_pop_front();
-	ASSERT_EQ(item.first, "a");
-	ASSERT_EQ(item.second, 1);
+	ASSERT_EQ(item->first, "a");
+	ASSERT_EQ(item->second, 1);
 	ASSERT_EQ(1, cm.size());
+}
+
+TEST(circle_map, pop_front_empty_map)
+{
+	circle_map<key, value> cm(2);
+	auto item = cm.get_and_pop_front();
+	ASSERT_TRUE(!item);
 }

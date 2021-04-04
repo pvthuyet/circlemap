@@ -3,6 +3,7 @@
 #include <boost/circular_buffer.hpp>
 #include <boost/algorithm/find_backward.hpp>
 #include <algorithm>
+#include <optional>
 
 template<class Key, class T>
 class circle_map
@@ -18,7 +19,8 @@ public:
 	using const_reference_internal_data = const std::pair<key_type, mapped_type>&;
 
 private:
-	boost::circular_buffer<internal_data> mBuffer;
+	using buffer_type = boost::circular_buffer<internal_data>;
+	buffer_type mBuffer;
 
 public:
 	circle_map(size_type capacity):
@@ -46,6 +48,14 @@ public:
 		return reverseFind ? rfind(k) != mBuffer.cend() : find(k) != mBuffer.cend();
 	}
 
+	auto erase(key_type const& k)
+	{
+		if (!mBuffer.empty()) {
+			return mBuffer.erase(find(k));
+		}
+		return mBuffer.end();
+	}
+
 	void push_back(key_type k, mapped_type v)
 	{
 		auto found = find(k);
@@ -57,12 +67,14 @@ public:
 		}
 	}
 
-	auto get_and_pop_front()
+	std::optional<internal_data> get_and_pop_front()
 	{
-		BOOST_ASSERT(!mBuffer.empty());
-		internal_data item = mBuffer.front();
-		mBuffer.pop_front();
-		return item;
+		if (!mBuffer.empty()) {
+			internal_data item = mBuffer.front();
+			mBuffer.pop_front();
+			return std::make_optional(std::move(item));
+		}
+		return std::nullopt;
 	}
 
 private:
