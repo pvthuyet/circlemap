@@ -7,7 +7,7 @@
 #include <shared_mutex>
 
 template<class Key, class T>
-class circle_map
+class circle_map2
 {
 public:
 	using key_type = Key;
@@ -25,7 +25,7 @@ private:
 	mutable std::shared_mutex mMutex;
 
 public:
-	circle_map(size_type capacity):
+	circle_map2(size_type capacity):
 		mBuffer(capacity)
 	{
 	}

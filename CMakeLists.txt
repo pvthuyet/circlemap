@@ -56,7 +56,7 @@ endif()
 add_executable(test_circle_map "")
 
 target_sources(test_circle_map PRIVATE
-    test.cpp
+    "test_circle_map2.cpp"
   )
 
 target_include_directories(test_circle_map PRIVATE

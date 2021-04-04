@@ -1,4 +1,4 @@
-#include "circle_map.hpp"
+#include "circle_map2.hpp"
 #include <gtest/gtest.h>
 #include <cstdlib>
 #include <string>
@@ -6,7 +6,7 @@
 
 using key = std::string;
 using value = int;
-using test_map = circle_map<key, value>;
+using test_map = circle_map2<key, value>;
 
 int main(int argc, char* argv[])
 {
