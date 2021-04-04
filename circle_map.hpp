@@ -11,11 +11,12 @@ class circle_map
 public:
 	using key_type = Key;
 	using mapped_type = T;
+	using opt_mapped_type = std::optional<mapped_type>;
 	using size_type = unsigned int;
 	using reference = mapped_type&;
 	using const_reference = const mapped_type&;
-	using opt_cref = std::optional<std::reference_wrapper<const mapped_type>>;
 	using pair = std::pair<key_type, mapped_type>;
+	using opt_pair = std::optional<pair>;
 
 private:
 	using buffer_type = boost::circular_buffer<pair>;
@@ -42,28 +43,6 @@ public:
 		return mBuffer.empty();
 	}
 
-	bool contains(key_type const& k, bool reverseFind = false) const
-	{
-		return reverseFind ? rfind_internal(k) != mBuffer.cend() : find_internal(k) != mBuffer.cend();
-	}
-
-	opt_cref find(key_type const& k) const
-	{
-		auto it = find_internal(k);
-		if (mBuffer.cend() != it) {
-			return opt_cref{it->second};
-		}
-		return std::nullopt;
-	}
-
-	auto erase(key_type const& k)
-	{
-		if (!mBuffer.empty()) {
-			return mBuffer.erase(find_internal(k));
-		}
-		return mBuffer.end();
-	}
-
 	void push_back(key_type k, mapped_type v)
 	{
 		auto found = find_internal(k);
@@ -75,7 +54,7 @@ public:
 		}
 	}
 
-	std::optional<pair> get_and_pop_front()
+	opt_pair get_and_pop_front()
 	{
 		if (!mBuffer.empty()) {
 			pair item = mBuffer.front();
@@ -83,6 +62,60 @@ public:
 			return std::make_optional(std::move(item));
 		}
 		return std::nullopt;
+	}
+
+	bool contains(key_type const& k, bool reverseFind = false) const
+	{
+		return reverseFind ? rfind_internal(k) != mBuffer.cend() : find_internal(k) != mBuffer.cend();
+	}
+
+	auto erase(key_type const& k)
+	{
+		if (!mBuffer.empty()) {
+			return mBuffer.erase(find_internal(k));
+		}
+		return mBuffer.end();
+	}
+
+	opt_mapped_type find(key_type const& k) const
+	{
+		auto it = find_internal(k);
+		if (mBuffer.cend() != it) {
+			return std::make_optional(it->second);
+		}
+		return std::nullopt;
+	}
+
+	template<class Predicate>
+	opt_mapped_type find_if(Predicate pre) const
+	{
+		auto it = std::ranges::find_if(mBuffer, pre);
+		if (mBuffer.cend() != it) {
+			return std::make_optional(it->second);
+		}
+		return std::nullopt;
+	}
+
+	template<class Predicate>
+	opt_mapped_type rfind_if(Predicate pre) const
+	{
+		auto it = boost::algorithm::find_if_backward(mBuffer, pre);
+		if (mBuffer.cend() != it) {
+			return std::make_optional(it->second);
+		}
+		return std::nullopt;
+	}
+
+	template<class Function>
+	void traversal(Function func) const
+	{
+		std::ranges::for_each(mBuffer, func);
+	}
+
+	template<class Function>
+	void rtraversal(Function func) const
+	{
+		std::ranges::for_each(std::crbegin(mBuffer), std::crend(mBuffer), func);
 	}
 
 private:
