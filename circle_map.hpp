@@ -14,12 +14,10 @@ public:
 	using size_type = unsigned int;
 	using reference = mapped_type&;
 	using const_reference = const mapped_type&;
-	using internal_data = std::pair<key_type, mapped_type>;
-	using reference_internal_data = std::pair<key_type, mapped_type>&;
-	using const_reference_internal_data = const std::pair<key_type, mapped_type>&;
+	using pair = std::pair<key_type, mapped_type>;
 
 private:
-	using buffer_type = boost::circular_buffer<internal_data>;
+	using buffer_type = boost::circular_buffer<pair>;
 	buffer_type mBuffer;
 
 public:
@@ -67,10 +65,10 @@ public:
 		}
 	}
 
-	std::optional<internal_data> get_and_pop_front()
+	std::optional<pair> get_and_pop_front()
 	{
 		if (!mBuffer.empty()) {
-			internal_data item = mBuffer.front();
+			pair item = mBuffer.front();
 			mBuffer.pop_front();
 			return std::make_optional(std::move(item));
 		}
