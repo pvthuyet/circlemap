@@ -14,6 +14,7 @@ public:
 	using size_type = unsigned int;
 	using reference = mapped_type&;
 	using const_reference = const mapped_type&;
+	using opt_cref = std::optional<std::reference_wrapper<const mapped_type>>;
 	using pair = std::pair<key_type, mapped_type>;
 
 private:
@@ -43,20 +44,29 @@ public:
 
 	bool contains(key_type const& k, bool reverseFind = false) const
 	{
-		return reverseFind ? rfind(k) != mBuffer.cend() : find(k) != mBuffer.cend();
+		return reverseFind ? rfind_internal(k) != mBuffer.cend() : find_internal(k) != mBuffer.cend();
+	}
+
+	opt_cref find(key_type const& k) const
+	{
+		auto it = find_internal(k);
+		if (mBuffer.cend() != it) {
+			return opt_cref{it->second};
+		}
+		return std::nullopt;
 	}
 
 	auto erase(key_type const& k)
 	{
 		if (!mBuffer.empty()) {
-			return mBuffer.erase(find(k));
+			return mBuffer.erase(find_internal(k));
 		}
 		return mBuffer.end();
 	}
 
 	void push_back(key_type k, mapped_type v)
 	{
-		auto found = find(k);
+		auto found = find_internal(k);
 		if (found == std::end(mBuffer)) {
 			mBuffer.push_back(std::make_pair(std::move(k), std::move(v)));
 		}
@@ -76,28 +86,28 @@ public:
 	}
 
 private:
-	auto find(key_type const& k) const
+	auto find_internal(key_type const& k) const
 	{
 		return std::ranges::find_if(mBuffer, [&k](auto const& item) {
 			return k == item.first;
 			});
 	}
 
-	auto find(key_type const& k)
+	auto find_internal(key_type const& k)
 	{
 		return std::ranges::find_if(mBuffer, [&k](auto const& item) {
 			return k == item.first;
 			});
 	}
 
-	auto rfind(key_type const& k) const
+	auto rfind_internal(key_type const& k) const
 	{
 		return boost::algorithm::find_if_backward(mBuffer, [&k](auto const& item) {
 			return k == item.first;
 			});
 	}
 
-	auto rfind(key_type const& k)
+	auto rfind_internal(key_type const& k)
 	{
 		return boost::algorithm::find_if_backward(mBuffer, [&k](auto const& item) {
 			return k == item.first;

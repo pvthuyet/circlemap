@@ -38,6 +38,22 @@ TEST(circle_map, contains_reverse_find)
 	ASSERT_TRUE(cm.contains("c", true));
 }
 
+TEST(circle_map, find)
+{
+	circle_map<key, value> cm(2);
+	cm.push_back("a", 1);
+	cm.push_back("b", 2);
+	auto const& found = cm.find("a");
+	ASSERT_EQ(found, 1);
+}
+
+TEST(circle_map, find_empty_map)
+{
+	circle_map<key, value> cm(2);
+	auto const& found = cm.find("a");
+	ASSERT_TRUE(!found);
+}
+
 TEST(circle_map, erase_empty_map)
 {
 	circle_map<key, value> cm(2);
